@@ -1,27 +1,27 @@
 package br.com.joao.spring_s3_qrcode_generator.config;
 
+import br.com.joao.spring_s3_qrcode_generator.repository.UserRepository;
 import br.com.joao.spring_s3_qrcode_generator.service.TokenService;
-import br.com.joao.spring_s3_qrcode_generator.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Configuration
+@Component
 public class JwtFilterConfig extends OncePerRequestFilter {
 
     private final TokenService tokenService;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
-    public JwtFilterConfig(TokenService tokenService, UserService userService) {
+    public JwtFilterConfig(TokenService tokenService, UserRepository userRepository) {
         this.tokenService = tokenService;
-        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -32,9 +32,11 @@ public class JwtFilterConfig extends OncePerRequestFilter {
         if(token != null) {
 
             var email = tokenService.validateToken(token);
-            var user = userService.loadUserByUsername(email);
+
+            var user = userRepository.findByEmailIgnoreCaseAndActiveTrue(email).orElseThrow(() -> new RuntimeException("User not found."));
 
             var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
