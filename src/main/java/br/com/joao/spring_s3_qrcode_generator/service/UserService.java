@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -27,14 +28,14 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmailIgnoreCase(username)
+        return userRepository.findByEmailIgnoreCaseAndActiveTrue(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found."));
     }
 
     @Transactional
     public User createUser(UserCreateRequest req) {
 
-        if(userRepository.findByEmailIgnoreCase(req.email()).isPresent()){
+        if(userRepository.findByEmailIgnoreCaseAndActiveTrue(req.email()).isPresent()){
             throw new RuntimeException("Email already registered");
         }
 
@@ -91,5 +92,9 @@ public class UserService implements UserDetailsService {
     public Page<User> getAllUsers(PageRequest pageable) {
 
         return userRepository.findAll(pageable);
+    }
+
+    public Optional<User> findUserById(Long id) {
+        return userRepository.findById(id);
     }
 }
