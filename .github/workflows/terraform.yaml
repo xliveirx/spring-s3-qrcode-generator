@@ -81,9 +81,9 @@ jobs:
           if [ "${{ inputs.destroy }}" = "true" ]; 
           then
             echo "Destroying resources..."
-            cd infra && terraform destroy -var-file="./envs/${{ inputs.environment }}/terraform.tfvars" -auto-approve
+            cd infra && terraform destroy -var-file="./env/${{ inputs.environment }}/terraform.tfvars" -auto-approve
           else
             echo "Planning and applying resources..."
-            cd infra && terraform plan -var-file="./envs/${{ inputs.environment }}/terraform.tfvars" -out="${{ inputs.environment }}.plan"
+            cd infra && terraform plan -var-file="./env/${{ inputs.environment }}/terraform.tfvars" -out="${{ inputs.environment }}.plan"
             terraform apply "${{ inputs.environment }}.plan"
           fi
