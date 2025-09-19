@@ -1,8 +1,8 @@
 resource "aws_s3_bucket" "qrcodes_bucket" {
   bucket = var.bucket_name
   tags = {
-    Name: aws_s3_bucket.qrcodes_bucket
-    Environment: Prod
+    Name: aws_s3_bucket.qrcodes_bucket.bucket
+    Environment: "prod"
   }
 }
 
