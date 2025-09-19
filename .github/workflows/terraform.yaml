@@ -55,14 +55,14 @@ jobs:
         working-directory: app
         run: |
             mvn -B -ntp clean verify
-            JAR_PATH=$(ls target/*.zip | head -n1)
+            JAR_PATH=$(ls target/*.jar | grep -v original | head -n1)
             echo "jar_path=$JAR_PATH" >> $GITHUB_OUTPUT
         id: build
 
       - name: Create Lambda Zip File
         run: |
           cd app
-          zip -r lambda.zip target/spring-s3-qrcode-generator-0.0.1-SNAPSHOT.jar
+          zip -j ../lambda.zip target/spring-s3-qrcode-generator-0.0.1-SNAPSHOT.jar
 
       - name: Terraform init
         run: |
