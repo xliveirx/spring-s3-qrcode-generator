@@ -8,7 +8,8 @@ resource "aws_db_instance" "database" {
   password = var.db_password
 
   vpc_security_group_ids = [aws_security_group.database_sg.id]
-  multi_az = false publicly_accessible = false
+  multi_az = false
+  publicly_accessible = false
 }
 
 resource "aws_security_group" "database_sg" {
