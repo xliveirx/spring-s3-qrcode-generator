@@ -66,10 +66,10 @@ jobs:
 
       - name: Terraform init
         run: |
-          terraform -chdir=infra init \
+          cd infra && terraform init \
           -backend-config="bucket=${{ inputs.aws_statefile_bucket_name }}" \
           -backend-config="key=${{ github.event.repository.name }}" \
-          -backend-config="region=${{ inputs.aws_region }}" \            
+          -backend-config="region=${{ inputs.aws_region }}" \
           -backend-config="dynamodb_table=${{ inputs.dynamo_db_terraform_lock }}"
 
       - name: Terraform workspace
