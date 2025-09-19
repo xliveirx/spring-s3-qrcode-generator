@@ -14,7 +14,6 @@ jobs:
     uses: ./.github/workflows/terraform.yaml
     with:
       environment: prod
-      aws-region: "us-east-1"
       destroy: false
       iam_assume_role_arn: "arn:aws:iam::050925927131:role/GithubActions-LinkShortener-Role"
       aws_statefile_bucket_name: "050925927131-terraform-statefile"
