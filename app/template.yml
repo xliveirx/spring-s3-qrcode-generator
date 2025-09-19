@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Serverless Spring Boot 2 API - my.service::my-service
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+  Function:
+    Architectures:
+      - arm64
+
+Resources:
+  MyServiceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: br.com.joao.spring_s3_qrcode_generator.StreamLambdaHandler::handleRequest
+      Runtime: java21
+      CodeUri: .
+      MemorySize: 512
+      Policies: AWSLambdaBasicExecutionRole
+      Timeout: 30
+      Environment:
+        Variables:
+          SPRING_PROFILES_ACTIVE: docker
+      Events:
+        ProxyResource:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: any
+
+Outputs:
+  MyServiceApi:
+    Description: URL for application
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/ping'
+    Export:
+      Name: MyServiceApi
