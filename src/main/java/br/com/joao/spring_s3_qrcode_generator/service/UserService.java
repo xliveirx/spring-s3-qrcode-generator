@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -92,9 +93,5 @@ public class UserService implements UserDetailsService {
     public Page<User> getAllUsers(PageRequest pageable) {
 
         return userRepository.findAll(pageable);
-    }
-
-    public Optional<User> findUserById(Long id) {
-        return userRepository.findById(id);
     }
 }

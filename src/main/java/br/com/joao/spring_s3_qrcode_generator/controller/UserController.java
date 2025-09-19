@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -70,6 +71,4 @@ public class UserController {
         return ResponseEntity.ok(users.map(UserResponse::fromDomain));
 
     }
-
-
 }
