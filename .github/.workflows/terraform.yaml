@@ -1,0 +1,84 @@
+name: "Terraform Workflow"
+
+on:
+  workflow-call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      aws_region:
+        type: string
+        required: true
+      destroy:
+        type: boolean
+        required: true
+      iam_assume_role_arn:
+        type: string
+        required: true
+      aws_statefile_bucket_name:
+        type: string
+        required: true
+      dynamo_db_terraform_lock:
+        type: string
+        required: true
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run: shell
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.3
+
+      - name: Configure AWS IAM Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{inputs.iam_assume_role_arn}}
+          role-session-name: GitHub_to_AWS_via_FederatedOIDC
+          aws-region: ${{inputs.aws_region}}
+
+      - name: Build & Test (Maven)
+        if: ${{ inputs.environment == 'dev' }}
+        working-directory: app
+        run: |
+            mvn -B -ntp clean verify
+            JAR_PATH=$(ls target/*.zip | head -n1)
+            echo "jar_path=$JAR_PATH" >> $GITHUB_OUTPUT
+        id: build
+
+      - name: Terraform init
+        run: |
+          cd infra && terraform init \
+          -backend-config="bucket=${{ inputs.aws_statefile_bucket_name }}" \
+          -backend-config="key=${{ github.event.repository.name }}" \
+          -backend-config="region=${{ inputs.aws_region }}" \            
+          -backend-config="dynamodb_table=${{ inputs.dynamo_db_terraform_lock }}"
+
+      - name: Terraform workspace
+        run: |
+          cd infra && terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }}
+
+      - name: Terraform Plan or Destroy
+        run: |
+          if [ "${{ inputs.destroy }}" = "true" ]; 
+          then
+            echo "Destroying resources..."
+            cd infra && terraform destroy -var-file="./envs/${{ inputs.environment }}/terraform.tfvars" -auto-approve
+          else
+            echo "Planning and applying resources..."
+            cd infra && terraform plan -var-file="./envs/${{ inputs.environment }}/terraform.tfvars" -out="${{ inputs.environment }}.plan"
+            terraform apply "${{ inputs.environment }}.plan"
+          fi
