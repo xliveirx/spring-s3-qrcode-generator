@@ -15,7 +15,7 @@ jobs:
     with:
       environment: prod
       destroy: false
-      iam_assume_role_arn: "arn:aws:iam::050925927131:role/GithubActions-LinkShortener-Role"
+      iam_assume_role_arn: "arn:aws:iam::050925927131:role/Github_Actions_QRCode_Generator"
       aws_statefile_bucket_name: "050925927131-terraform-statefile"
       dynamo_db_terraform_lock: "050925927131-terraform-lock"
       aws_region: "us-east-1"
