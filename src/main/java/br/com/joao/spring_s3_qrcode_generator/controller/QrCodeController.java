@@ -46,7 +46,8 @@ public class QrCodeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteQrCodeById(@PathVariable Long id, User logged){
+    public ResponseEntity<Void> deleteQrCodeById(@PathVariable Long id,
+                                                 @AuthenticationPrincipal User logged){
 
         qrCodeService.deleteQrCodeById(id, logged);
 
