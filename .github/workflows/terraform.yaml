@@ -61,9 +61,8 @@ jobs:
 
       - name: Create Lambda Zip File
         run: |
-          echo "JAR_PATH: ${{ steps.build.outputs.jar_path }}"
           cd app
-          zip -r ../lambda.zip ${{ steps.build.outputs.jar_path }}
+          zip lambda.zip target/spring-s3-qrcode-generator-0.0.1-SNAPSHOT.jar
 
       - name: Terraform init
         run: |
