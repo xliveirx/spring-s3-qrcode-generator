@@ -15,6 +15,9 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,13 +38,16 @@ public class QrCodeService {
     private String bucketName;
 
     private final QrCodeRepository qrCodeRepository;
+    private final S3Service s3Service;
     private final AmazonS3 amazonS3;
 
-    public QrCodeService(QrCodeRepository qrCodeRepository, AmazonS3 amazonS3) {
+    public QrCodeService(QrCodeRepository qrCodeRepository, S3Service s3Service, AmazonS3 amazonS3) {
         this.qrCodeRepository = qrCodeRepository;
+        this.s3Service = s3Service;
         this.amazonS3 = amazonS3;
     }
 
+    @Transactional
     public QrCodeResponse createQrCode(QrCodeCreateRequest req, User logged) throws WriterException, IOException {
 
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
@@ -56,11 +62,11 @@ public class QrCodeService {
 
         String key = "user-" + logged.getId() + "/qr-" + UUID.randomUUID() + ".png";
 
-        uploadFile(pngQrCodeData, key, "image/png");
+        s3Service.uploadFile(pngQrCodeData, key, "image/png");
 
         var qrcode = qrCodeRepository.save(new QrCode(req.link(), logged, key));
 
-        var presignedUrl = generatePresignedUrl(qrcode.getS3Key(), 10);
+        var presignedUrl = s3Service.generatePresignedUrl(qrcode.getS3Key(), 10);
 
         return QrCodeResponse.fromDomain(qrcode, presignedUrl);
 
@@ -72,48 +78,27 @@ public class QrCodeService {
 
         return qrcodes
                 .map(q -> {
-                    var presignedUrl = generatePresignedUrl(q.getS3Key(), 10);
+                    var presignedUrl = s3Service.generatePresignedUrl(q.getS3Key(), 10);
                     return QrCodeResponse.fromDomain(q, presignedUrl);
                 });
     }
 
-    public void uploadFile(byte[] fileData, String fileName, String contentType) throws IOException {
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-
-        objectMetadata.setContentType(contentType);
-        objectMetadata.setContentLength(fileData.length);
-
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(fileData)) {
-            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, fileName, inputStream, objectMetadata);
-            amazonS3.putObject(putObjectRequest);
-
-        } catch (IOException e) {
-            throw new RuntimeException("Erro ao fazer upload do arquivo ao S3.", e);
-        }
-    }
-
+    @Transactional
     public void deleteQrCodeById(Long id, User logged) {
 
         var qrcode = qrCodeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("QrCode not found."));
 
-        if (qrcode.getUser().getId().equals(logged.getId())) {
+        if(qrcode.getUser().getId().equals(logged.getId())) {
             qrcode.setActive(false);
-            qrCodeRepository.save(qrcode);
 
-            amazonS3.deleteObject(bucketName, qrcode.getS3Key());
+            try {
+                amazonS3.deleteObject(bucketName, qrcode.getS3Key());
+            } catch (Exception e) {
+                System.err.println("Error deleting S3 object: " + e.getMessage());
+            }
         }
     }
-
-    public String generatePresignedUrl(String key, int expirationInMinutes) {
-        Date expiration = new Date(System.currentTimeMillis() + expirationInMinutes * 60 * 1000);
-
-        GeneratePresignedUrlRequest generatePresignedUrlRequest =
-                new GeneratePresignedUrlRequest(bucketName, key)
-                        .withMethod(com.amazonaws.HttpMethod.GET)
-                        .withExpiration(expiration);
-
-        URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
-        return url.toString();
-    }
 }
+
+
