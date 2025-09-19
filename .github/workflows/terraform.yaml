@@ -61,8 +61,13 @@ jobs:
 
       - name: Create Lambda Zip File
         run: |
+          mkdir -p lambda-package
           cd app
-          zip -j ../lambda.zip target/spring-s3-qrcode-generator-0.0.1-SNAPSHOT.jar
+          # Extract only the necessary classes and dependencies
+          jar -xf target/spring-s3-qrcode-generator-0.0.1-SNAPSHOT.jar
+          cd ..
+          # Create a smaller zip file with only the necessary files
+          zip -r lambda.zip app/META-INF app/BOOT-INF/classes app/BOOT-INF/lib/aws-serverless-java-container-springboot3-2.0.1.jar app/BOOT-INF/lib/aws-java-sdk-s3-*.jar app/BOOT-INF/lib/google-zxing-*.jar
 
       - name: Terraform init
         run: |
