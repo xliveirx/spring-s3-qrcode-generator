@@ -61,12 +61,14 @@ jobs:
 
       - name: Create Lambda Zip File
         run: |
-          # Simply use the Spring Boot fat JAR directly
-          # This ensures all classes and dependencies are properly included
           cd app
           cp target/spring-s3-qrcode-generator-0.0.1-SNAPSHOT.jar ../lambda_function.jar
           cd ..
           zip -j lambda.zip lambda_function.jar
+
+      - name: Verify Lambda Zip File
+        run: |
+          ls -l lambda.zip
 
       - name: Terraform init
         run: |
