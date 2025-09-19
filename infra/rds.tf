@@ -1,5 +1,4 @@
-resource "aws_db_instance" "database"
-{
+resource "aws_db_instance" "database" {
   allocated_storage = 10
   db_name = "qrcode_generator"
   engine = "mysql"
