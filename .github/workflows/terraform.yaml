@@ -52,7 +52,6 @@ jobs:
           aws-region: ${{inputs.aws_region}}
 
       - name: Build & Test (Maven)
-        if: ${{ inputs.environment == 'dev' }}
         working-directory: app
         run: |
             mvn -B -ntp clean verify
@@ -62,8 +61,9 @@ jobs:
 
       - name: Create Lambda Zip File
         run: |
-            cd app
-            zip lambda.zip ${{ steps.build.outputs.jar_path }}
+          echo "JAR_PATH: ${{ steps.build.outputs.jar_path }}"
+          cd app
+          zip -r ../lambda.zip ${{ steps.build.outputs.jar_path }}
 
       - name: Terraform init
         run: |
