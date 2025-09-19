@@ -62,6 +62,7 @@ jobs:
 
       - name: Create Lambda Zip File
         run: |
+            cd app
             zip lambda.zip ${{ steps.build.outputs.jar_path }}
 
       - name: Terraform init
