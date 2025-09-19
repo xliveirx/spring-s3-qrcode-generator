@@ -44,10 +44,12 @@ resource "aws_lambda_function" "lambda" {
   memory_size = 256
   timeout = 15
 
-  filename = "lambda.zip"
-  source_code_hash = filebase64sha256("lambda.zip")
+  filename = "../lambda.zip"
+  source_code_hash = filebase64sha256("../lambda.zip")
 
   environment {
-    BUCKET_NAME = aws_s3_bucket.qrcodes_bucket.bucket
+    variables = {
+      BUCKET_NAME = aws_s3_bucket.qrcodes_bucket.bucket
+    }
   }
 }
