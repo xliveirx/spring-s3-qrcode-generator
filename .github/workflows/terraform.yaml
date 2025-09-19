@@ -61,12 +61,47 @@ jobs:
 
       - name: Create Lambda Zip File
         run: |
-          # Simply use the Spring Boot fat JAR directly
-          # This ensures all classes and dependencies are properly included
+          # Create a temporary directory for the Lambda package
+          mkdir -p lambda-package
           cd app
-          cp target/spring-s3-qrcode-generator-0.0.1-SNAPSHOT.jar ../lambda_function.jar
-          cd ..
-          zip -j lambda.zip lambda_function.jar
+
+          # Extract the JAR to access its contents
+          mkdir -p ../lambda-package/extract
+          cd ../lambda-package/extract
+          jar -xf ../../app/target/spring-s3-qrcode-generator-0.0.1-SNAPSHOT.jar
+
+          # Create a more optimized zip with only the absolutely necessary files
+          cd ../..
+
+          # First, include the application classes and META-INF
+          zip -r lambda.zip lambda-package/extract/META-INF lambda-package/extract/BOOT-INF/classes
+
+          # Add only the most essential dependencies
+          # AWS Lambda and API Gateway integration
+          zip -ur lambda.zip lambda-package/extract/BOOT-INF/lib/aws-serverless-java-container-springboot3-*.jar
+          zip -ur lambda.zip lambda-package/extract/BOOT-INF/lib/aws-lambda-java-core-*.jar
+          zip -ur lambda.zip lambda-package/extract/BOOT-INF/lib/aws-lambda-java-events-*.jar
+
+          # S3 SDK (only the core and S3 parts)
+          zip -ur lambda.zip lambda-package/extract/BOOT-INF/lib/aws-java-sdk-s3-*.jar
+          zip -ur lambda.zip lambda-package/extract/BOOT-INF/lib/aws-java-sdk-core-*.jar
+
+          # QR code generation
+          zip -ur lambda.zip lambda-package/extract/BOOT-INF/lib/core-*.jar
+          zip -ur lambda.zip lambda-package/extract/BOOT-INF/lib/javase-*.jar
+
+          # Minimal Spring Boot (only what's needed for the container)
+          zip -ur lambda.zip lambda-package/extract/BOOT-INF/lib/spring-boot-*.jar
+          zip -ur lambda.zip lambda-package/extract/BOOT-INF/lib/spring-core-*.jar
+          zip -ur lambda.zip lambda-package/extract/BOOT-INF/lib/spring-context-*.jar
+          zip -ur lambda.zip lambda-package/extract/BOOT-INF/lib/spring-web-*.jar
+          zip -ur lambda.zip lambda-package/extract/BOOT-INF/lib/spring-webmvc-*.jar
+
+          # Jackson for JSON processing
+          zip -ur lambda.zip lambda-package/extract/BOOT-INF/lib/jackson-*.jar
+
+          # Clean up temporary files
+          rm -rf lambda-package lambda_function.jar
 
       - name: Terraform init
         run: |
