@@ -59,6 +59,10 @@ jobs:
             echo "jar_path=$JAR_PATH" >> $GITHUB_OUTPUT
         id: build
 
+      - name: Create Lambda Zip File
+        run: |
+            zip lambda.zip ${{ steps.build.outputs.jar_path }}
+
       - name: Terraform init
         run: |
           cd infra && terraform init \

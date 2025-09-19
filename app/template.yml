@@ -13,7 +13,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: br.com.joao.spring_s3_qrcode_generator.StreamLambdaHandler::handleRequest
-      Runtime: java21
+      Runtime: java17
       CodeUri: .
       MemorySize: 512
       Policies: AWSLambdaBasicExecutionRole

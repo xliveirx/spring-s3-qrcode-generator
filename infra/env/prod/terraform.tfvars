@@ -1,0 +1,5 @@
+aws_region = "us-east-1"
+bucket_name = "050925927131-qrcode-bucket"
+db_username = "admin"
+db_password = "admin"
+lambda_handler = "br.com.joao.spring_s3_qrcode_generator.StreamLambdaHandler::handleRequest"
