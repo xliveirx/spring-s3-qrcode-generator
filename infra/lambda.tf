@@ -51,8 +51,8 @@ resource "aws_iam_policy_attachment" "attach" {
 resource "aws_s3_object" "lambda_package" {
   bucket = var.lambda_bucket_name
   key    = "lambda/prod/lambda.zip"
-  source = "${path.module}/../lambda.zip"
-  # etag   = filemd5("${path.module}/../lambda.zip")
+  source = "${path.module}/../app/target/lambda.zip"
+  # etag   = filemd5("${path.module}/../app/target/lambda.zip")
 }
 
 resource "aws_lambda_function" "lambda" {
