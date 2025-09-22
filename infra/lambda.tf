@@ -51,8 +51,8 @@ resource "aws_iam_policy_attachment" "attach" {
 resource "aws_s3_object" "lambda_package" {
   bucket = var.lambda_bucket_name
   key    = "lambda/prod/lambda.jar"
-  source = "${path.module}/../app/target/spring-s3-qrcode-generator-0.0.1-SNAPSHOT-shaded.jar"
-  # etag   = filemd5("${path.module}/../app/target/spring-s3-qrcode-generator-0.0.1-SNAPSHOT-shaded.jar")
+  source = "${path.module}/../app/target/spring-s3-qrcode-generator-0.0.1-SNAPSHOT.jar"
+  # etag   = filemd5("${path.module}/../app/target/spring-s3-qrcode-generator-0.0.1-SNAPSHOT.jar")
 }
 
 resource "aws_lambda_function" "lambda" {
