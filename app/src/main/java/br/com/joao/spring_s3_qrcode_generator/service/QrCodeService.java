@@ -6,6 +6,7 @@ import br.com.joao.spring_s3_qrcode_generator.dto.QrCodeCreateRequest;
 import br.com.joao.spring_s3_qrcode_generator.dto.QrCodeResponse;
 import br.com.joao.spring_s3_qrcode_generator.repository.QrCodeRepository;
 import br.com.joao.spring_s3_qrcode_generator.exception.NotFoundException;
+import br.com.joao.spring_s3_qrcode_generator.exception.ForbiddenException;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -80,14 +81,16 @@ public class QrCodeService {
         var qrcode = qrCodeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("QrCode not found."));
 
-        if(qrcode.getUser().getId().equals(logged.getId())) {
-            qrcode.setActive(false);
+        if(!qrcode.getUser().getId().equals(logged.getId())) {
+            throw new ForbiddenException("User is not the owner of this QRCode");
+        }
 
-            try {
-                s3Service.deleteFile(qrcode.getS3Key());
-            } catch (Exception e) {
-                System.err.println("Error deleting S3 object: " + e.getMessage());
-            }
+        qrcode.setActive(false);
+
+        try {
+            s3Service.deleteFile(qrcode.getS3Key());
+        } catch (Exception e) {
+            System.err.println("Error deleting S3 object: " + e.getMessage());
         }
     }
 }
