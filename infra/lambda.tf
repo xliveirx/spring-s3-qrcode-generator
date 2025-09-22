@@ -26,7 +26,8 @@ resource "aws_iam_policy" "lambda" {
         Action = ["rds:DescribeDBInstances"],
         Effect = "Allow",
         Resource = aws_db_instance.database.arn
-      }]
+      },
+    ]
   })
 }
 
@@ -40,7 +41,7 @@ resource "aws_s3_object" "lambda_package" {
   bucket = var.lambda_bucket_name
   key    = "lambda/prod/lambda.zip"
   source = "${path.module}/../lambda.zip"
-  etag   = filemd5("${path.module}/../lambda.zip")
+  # etag   = filemd5("${path.module}/../lambda.zip")
 }
 
 resource "aws_lambda_function" "lambda" {
