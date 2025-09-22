@@ -15,6 +15,11 @@ public class StreamLambdaHandler implements RequestStreamHandler {
     private static SpringBootLambdaContainerHandler<HttpApiV2ProxyRequest, AwsProxyResponse> handler;
     static {
         try {
+            // Garante profile lambda por fallback quando rodando na AWS (sem sobrescrever caso já setado)
+            if (System.getenv("AWS_LAMBDA_FUNCTION_NAME") != null && System.getProperty("spring.profiles.active") == null
+                    && System.getenv("SPRING_PROFILES_ACTIVE") == null) {
+                System.setProperty("spring.profiles.active", "lambda");
+            }
             handler = SpringBootLambdaContainerHandler.getHttpApiV2ProxyHandler(SpringS3QrcodeGeneratorApplication.class);
         } catch (ContainerInitializationException e) {
             // if we fail here. We re-throw the exception to force another cold start
