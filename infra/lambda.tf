@@ -63,6 +63,12 @@ resource "aws_lambda_function" "lambda" {
   timeout       = 30
   memory_size   = 1024
 
+  environment {
+    variables = {
+      SPRING_PROFILES_ACTIVE = "lambda"
+    }
+  }
+
   # em vez de filename:
   s3_bucket = aws_s3_object.lambda_package.bucket
   s3_key    = aws_s3_object.lambda_package.key
