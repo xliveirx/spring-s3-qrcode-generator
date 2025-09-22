@@ -88,5 +88,5 @@ jobs:
           else
             echo "Planning and applying resources..."
             cd infra && terraform plan -var-file="./env/${{ inputs.environment }}/terraform.tfvars" -out="${{ inputs.environment }}.plan"
-            cd infra && terraform apply "${{ inputs.environment }}.plan"
+            terraform apply "${{ inputs.environment }}.plan"
           fi
