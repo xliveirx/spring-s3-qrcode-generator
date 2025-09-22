@@ -6,10 +6,6 @@ import br.com.joao.spring_s3_qrcode_generator.dto.QrCodeCreateRequest;
 import br.com.joao.spring_s3_qrcode_generator.dto.QrCodeResponse;
 import br.com.joao.spring_s3_qrcode_generator.repository.QrCodeRepository;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
@@ -33,18 +29,12 @@ import java.util.UUID;
 @Service
 public class QrCodeService {
 
-
-    @Value("${aws.s3.bucket-name}")
-    private String bucketName;
-
     private final QrCodeRepository qrCodeRepository;
     private final S3Service s3Service;
-    private final AmazonS3 amazonS3;
 
-    public QrCodeService(QrCodeRepository qrCodeRepository, S3Service s3Service, AmazonS3 amazonS3) {
+    public QrCodeService(QrCodeRepository qrCodeRepository, S3Service s3Service) {
         this.qrCodeRepository = qrCodeRepository;
         this.s3Service = s3Service;
-        this.amazonS3 = amazonS3;
     }
 
     @Transactional
@@ -93,7 +83,7 @@ public class QrCodeService {
             qrcode.setActive(false);
 
             try {
-                amazonS3.deleteObject(bucketName, qrcode.getS3Key());
+                s3Service.deleteFile(qrcode.getS3Key());
             } catch (Exception e) {
                 System.err.println("Error deleting S3 object: " + e.getMessage());
             }

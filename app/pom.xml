@@ -43,12 +43,19 @@
             <version>2.0.1</version>
         </dependency>
 
-        <!-- AWS SDK S3 -->
+        <!-- AWS SDK v2 S3 -->
         <dependency>
-            <groupId>com.amazonaws</groupId>
-            <artifactId>aws-java-sdk-s3</artifactId>
-            <version>1.12.791</version>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
         </dependency>
+
+        <!-- Spring Cloud AWS -->
+        <dependency>
+            <groupId>io.awspring.cloud</groupId>
+            <artifactId>spring-cloud-aws-starter-s3</artifactId>
+            <version>3.1.1</version>
+        </dependency>
+
 
         <!-- QRCode -->
         <dependency>
