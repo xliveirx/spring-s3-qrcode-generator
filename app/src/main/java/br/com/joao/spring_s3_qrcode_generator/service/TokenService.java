@@ -8,6 +8,7 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.stereotype.Service;
+import br.com.joao.spring_s3_qrcode_generator.exception.TokenException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -27,8 +28,7 @@ public class TokenService {
                     .withExpiresAt(expiresAt(30))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
-
-            throw new RuntimeException("Erro ao gerar token JWT", exception);
+            throw new TokenException("Erro ao gerar token JWT", exception);
         }
     }
 
@@ -46,7 +46,7 @@ public class TokenService {
             return decodedJWT.getSubject();
 
         } catch (JWTVerificationException exception) {
-            throw new RuntimeException("Erro ao validar token JWT", exception);
+            throw new TokenException("Erro ao validar token JWT", exception);
         }
     }
 

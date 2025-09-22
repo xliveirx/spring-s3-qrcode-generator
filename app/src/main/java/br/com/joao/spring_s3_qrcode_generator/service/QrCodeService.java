@@ -5,6 +5,7 @@ import br.com.joao.spring_s3_qrcode_generator.domain.User;
 import br.com.joao.spring_s3_qrcode_generator.dto.QrCodeCreateRequest;
 import br.com.joao.spring_s3_qrcode_generator.dto.QrCodeResponse;
 import br.com.joao.spring_s3_qrcode_generator.repository.QrCodeRepository;
+import br.com.joao.spring_s3_qrcode_generator.exception.NotFoundException;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -77,7 +78,7 @@ public class QrCodeService {
     public void deleteQrCodeById(Long id, User logged) {
 
         var qrcode = qrCodeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("QrCode not found."));
+                .orElseThrow(() -> new NotFoundException("QrCode not found."));
 
         if(qrcode.getUser().getId().equals(logged.getId())) {
             qrcode.setActive(false);

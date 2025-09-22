@@ -9,6 +9,7 @@ import software.amazon.awssdk.services.s3.model.GetUrlRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import br.com.joao.spring_s3_qrcode_generator.exception.StorageException;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
@@ -53,7 +54,7 @@ public class S3Service {
 
             s3Client.putObject(putObjectRequest, software.amazon.awssdk.core.sync.RequestBody.fromInputStream(inputStream, fileData.length));
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao fazer upload do arquivo ao S3.", e);
+            throw new StorageException("Erro ao fazer upload do arquivo ao S3.", e);
         }
     }
 
@@ -65,7 +66,7 @@ public class S3Service {
                     .build();
             s3Client.deleteObject(deleteRequest);
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao deletar objeto do S3.", e);
+            throw new StorageException("Erro ao deletar objeto do S3.", e);
         }
     }
 }

@@ -2,6 +2,9 @@ package br.com.joao.spring_s3_qrcode_generator.service;
 
 import br.com.joao.spring_s3_qrcode_generator.domain.User;
 import br.com.joao.spring_s3_qrcode_generator.dto.UserCreateRequest;
+import br.com.joao.spring_s3_qrcode_generator.exception.BadRequestException;
+import br.com.joao.spring_s3_qrcode_generator.exception.ConflictException;
+import br.com.joao.spring_s3_qrcode_generator.exception.NotFoundException;
 import br.com.joao.spring_s3_qrcode_generator.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -37,11 +40,11 @@ public class UserService implements UserDetailsService {
     public User createUser(UserCreateRequest req) {
 
         if(userRepository.findByEmailIgnoreCaseAndActiveTrue(req.email()).isPresent()){
-            throw new RuntimeException("Email already registered");
+            throw new ConflictException("Email already registered");
         }
 
         if(!req.password().equals(req.confirmPassword())){
-            throw new RuntimeException("Passwords don't match");
+            throw new BadRequestException("Passwords don't match");
         }
 
         var encodedPassword = passwordEncoder.encode(req.password());
@@ -55,7 +58,7 @@ public class UserService implements UserDetailsService {
     public void disableUser(User logged) {
 
         var user = userRepository.findById(logged.getId())
-                .orElseThrow(() -> new RuntimeException("User not found."));
+                .orElseThrow(() -> new NotFoundException("User not found."));
 
         user.setActive(false);
         user.setUpdatedAt(LocalDateTime.now());
@@ -68,7 +71,7 @@ public class UserService implements UserDetailsService {
     public User enableUserById(Long id) {
 
         var user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found."));
+                .orElseThrow(() -> new NotFoundException("User not found."));
 
         user.setActive(true);
         user.setUpdatedAt(LocalDateTime.now());
@@ -81,7 +84,7 @@ public class UserService implements UserDetailsService {
     public void disableUserById(Long id) {
 
         var user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found."));
+                .orElseThrow(() -> new NotFoundException("User not found."));
 
         user.setActive(false);
         user.setUpdatedAt(LocalDateTime.now());
