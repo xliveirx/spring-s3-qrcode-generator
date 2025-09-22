@@ -36,20 +36,22 @@ resource "aws_iam_policy_attachment" "attach" {
   policy_arn = aws_iam_policy.lambda.arn
 }
 
+resource "aws_s3_object" "lambda_package" {
+  bucket = var.lambda_bucket_name
+  key    = "lambda/prod/lambda.zip"
+  source = "${path.module}/../lambda.zip"
+  etag   = filemd5("${path.module}/../lambda.zip")
+}
+
 resource "aws_lambda_function" "lambda" {
   function_name = "qrcode_generator"
-  role = aws_iam_role.lambda.arn
-  handler = var.lambda_handler
-  runtime = "java17"
-  memory_size = 256
-  timeout = 15
+  role          = aws_iam_role.lambda.arn
+  handler       = var.lambda_handler
+  runtime       = "java17"
+  timeout       = 30
+  memory_size   = 1024
 
-  filename = "../lambda.zip"
-  source_code_hash = filebase64sha256("../lambda.zip")
-
-  environment {
-    variables = {
-      BUCKET_NAME = aws_s3_bucket.qrcodes_bucket.bucket
-    }
-  }
+  # em vez de filename:
+  s3_bucket = aws_s3_object.lambda_package.bucket
+  s3_key    = aws_s3_object.lambda_package.key
 }

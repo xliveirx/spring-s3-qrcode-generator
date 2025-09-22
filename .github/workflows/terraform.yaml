@@ -70,6 +70,10 @@ jobs:
         run: |
           ls -l lambda.zip
 
+      - name: Upload Lambda package to S3
+        run: |
+          aws s3 cp lambda.zip s3://${{ inputs.lambda_bucket_name }}/lambda/${{ inputs.environment }}/lambda.zip
+
       - name: Terraform init
         run: |
           cd infra && terraform init \

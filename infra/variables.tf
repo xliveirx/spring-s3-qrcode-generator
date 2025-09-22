@@ -17,3 +17,7 @@ variable "db_password" {
 variable "lambda_handler" {
   type = string
 }
+
+variable "lambda_bucket_name"{
+  type = string
+}
