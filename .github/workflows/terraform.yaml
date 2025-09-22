@@ -54,7 +54,7 @@ jobs:
       - name: Build & Test (Maven)
         working-directory: app
         run: |
-            mvn -B -ntp clean verify
+            mvn -B -ntp clean package -Plambda
             JAR_PATH=$(ls target/*.jar | grep -v original | head -n1)
             echo "jar_path=$JAR_PATH" >> $GITHUB_OUTPUT
         id: build
