@@ -60,7 +60,7 @@ resource "aws_lambda_function" "lambda" {
   role          = aws_iam_role.lambda.arn
   handler       = var.lambda_handler
   runtime       = "java17"
-  timeout       = 30
+  timeout       = 60
   memory_size   = 1024
 
   environment {
