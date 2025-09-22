@@ -16,14 +16,14 @@ resource "aws_iam_policy" "lambda" {
     Version = "2012-10-17"
     Statement = [
       {
-      Action = ["s3:GetObject", "s3:PutObject", "s3:deleteObject"],
+      Action = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
       Effect = "Allow",
       Resource = [ aws_s3_bucket.qrcodes_bucket.arn, "${aws_s3_bucket.qrcodes_bucket.arn}/*"]
       },
       {
       Action = ["logs:CreateLogGroup","logs:CreateLogStream","logs:PutLogEvents"],
         Effect = "Allow", Resource = "*" }, {
-        Action = ["rds:DescribeDBInstances", "rds:Connect"],
+        Action = ["rds:DescribeDBInstances"],
         Effect = "Allow",
         Resource = aws_db_instance.database.arn
       }]
@@ -54,4 +54,9 @@ resource "aws_lambda_function" "lambda" {
   # em vez de filename:
   s3_bucket = aws_s3_object.lambda_package.bucket
   s3_key    = aws_s3_object.lambda_package.key
+
+ vpc_config {
+   security_group_ids = [aws_security_group.lambda.id]
+   subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+ }
 }
