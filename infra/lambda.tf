@@ -66,6 +66,11 @@ resource "aws_lambda_function" "lambda" {
   environment {
     variables = {
       SPRING_PROFILES_ACTIVE = "lambda"
+      DB_HOST     = aws_db_instance.database.address
+      DB_PORT     = "3306"
+      DB_NAME     = "qrcode_generator"
+      DB_USERNAME = var.db_username
+      DB_PASSWORD = var.db_password
     }
   }
 
