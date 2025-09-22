@@ -67,6 +67,8 @@ resource "aws_lambda_function" "lambda" {
   s3_bucket = aws_s3_object.lambda_package.bucket
   s3_key    = aws_s3_object.lambda_package.key
 
+  depends_on = [aws_s3_object.lambda_package]
+
  vpc_config {
    security_group_ids = [aws_security_group.lambda.id]
    subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
