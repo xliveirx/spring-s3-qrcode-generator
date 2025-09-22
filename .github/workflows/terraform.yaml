@@ -21,6 +21,9 @@ on:
       dynamo_db_terraform_lock:
         type: string
         required: true
+      lambda_bucket_name:
+        type: string
+        required: true
 
 jobs:
   terraform:

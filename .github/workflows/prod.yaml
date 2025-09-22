@@ -19,3 +19,4 @@ jobs:
       aws_statefile_bucket_name: "050925927131-terraform-statefile"
       dynamo_db_terraform_lock: "050925927131-terraform-lock"
       aws_region: "us-east-1"
+      lambda_bucket_name: "050925927131-qrcode-lambda-bucket"
