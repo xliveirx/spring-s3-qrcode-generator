@@ -6,7 +6,7 @@ Aplicação Spring Boot que gerencia usuários e gera QR Codes armazenando os ar
 - Java 17, Spring Boot 3 (Web, Security, Data JPA)
 - MySQL 8 (RDS) + HikariCP
 - AWS: Lambda, API Gateway HTTP API (v2), S3, RDS, VPC, NAT
-- Terraform (infra as code)
+- Terraform (IaC)
 - ZXing (geração de QR Codes)
 
 ## Estrutura de Pastas
